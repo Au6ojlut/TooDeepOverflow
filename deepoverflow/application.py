@@ -1,6 +1,7 @@
 import os.path
 import pickle
 import nmslib
+import gensim
 from .cleaner import clean
 
 
@@ -44,4 +45,4 @@ class Application:
         for ans_id in answers:
             answers_body.append(self.answers[ans_id])
 
-        return '\n'.join(answers_body)
+        return gensim.summarization.summarize(' '.join(answers_body))

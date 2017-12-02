@@ -37,6 +37,9 @@
             </div>
         </form>
 
+        <p id="answer">
+        </p>
+
     </main>
 
 </div>
@@ -52,7 +55,12 @@
     $(document).ready(function () {
         $('form[name=main-form]').submit(function () {
             $.post($(this).attr('action'), $(this).serialize(), function (res) {
-                alert(res);
+                res = JSON.parse(res);
+                if (res['status'] == 'error') {
+                    alert('Error: ' + res['reason']);
+                } else {
+                    $('#answer').html(res['result']);
+                }
             });
 
             return false;
