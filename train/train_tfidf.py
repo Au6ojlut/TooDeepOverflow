@@ -1,10 +1,9 @@
 import os.path
-from annoy import AnnoyIndex
+import nmslib
 import pickle
-import tqdm
-from sklearn.decomposition import PCA
+from sklearn.decomposition import TruncatedSVD
 
-from deepoverflow.similar import build_tfidf_model, TFIDF_MAX_FEATURES
+from deepoverflow.similar import build_tfidf_model
 
 DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
 PCA_COMPONENTS = 1024
@@ -37,19 +36,30 @@ transformed_questions = tfidf.transform(cleaned_questions)
 
 print('transformed questions')
 
-pca = PCA(n_components=PCA_COMPONENTS)
-transformed_questions = pca.fit_transform(transformed_questions)
-print('performed PCA')
-print(pca.explained_variance_ratio_.sum())
+pca_path = os.path.join(DATA_ROOT, 'computed', 'pca.pickle')
 
+if os.path.exists(pca_path):
+    with open(pca_path, 'rb') as f:
+        pca = pickle.load(f)
 
-t = AnnoyIndex(PCA_COMPONENTS)
-for idx, q in tqdm.tqdm(enumerate(transformed_questions), total=total):
-    t.add_item(idx, q.reshape(-1))
+    print('loaded PCA')
 
-t.build(10)
+    transformed_questions = pca.transform(transformed_questions)
+    print('performed PCA')
+else:
+    pca = TruncatedSVD(n_components=PCA_COMPONENTS, n_iter=1, random_state=42)
+    transformed_questions = pca.fit_transform(transformed_questions)
+    print('performed PCA')
+    print(pca.explained_variance_ratio_.sum())
 
-t.save(os.path.join(DATA_ROOT, 'computed', 'index.ann'))
+    with open(pca_path, 'wb') as f:
+        pickle.dump(pca, f)
 
-print('saved Annoy Index')
+    print('saved PCA')
 
+index = nmslib.init(method='hnsw', space='cosinesimil')
+index.addDataPointBatch(data=transformed_questions, ids=ids)
+index.createIndex({'post': 2}, print_progress=True)
+index.saveIndex(os.path.join(DATA_ROOT, 'computed', 'index.nmslib'))
+
+print('saved nmslib index')
