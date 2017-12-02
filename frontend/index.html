@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>DeepOverflow</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="/css/main.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="header clearfix">
+        <h1>DeepOverflow</h1>
+    </header>
+
+    <main role="main">
+
+        <form name="main-form" action="/api/summarize" method="GET">
+            <div class="form-group">
+                <label for="query">Input your question:</label>
+                <textarea class="form-control" rows="5" id="query"></textarea>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Summarize!</button>
+            </div>
+        </form>
+
+    </main>
+
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery-3.2.1.min.js"></script>
+<script src="/js/popper.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('form[name=main-form]').submit(function () {
+            $.post($(this).attr('action'), $(this).serialize(), function (res) {
+                alert(res);
+            });
+        });
+    });
+
+</script>
+
+</body>
+</html>
