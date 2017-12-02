@@ -9,7 +9,7 @@ def question2vec(text):
     pass
 
 
-def build_tfidf_model(text):
+def build_tfidf_model(texts):
     vectorizer = TfidfVectorizer(input='content', max_features=TFIDF_MAX_FEATURES, use_idf=True, smooth_idf=True)
-    vectorizer.fit(raw_documents=text)
+    vectorizer.fit(raw_documents=texts)
     return vectorizer

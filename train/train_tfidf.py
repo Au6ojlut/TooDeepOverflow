@@ -1,37 +1,55 @@
 import os.path
-import pandas as pd
+from annoy import AnnoyIndex
 import pickle
-import itertools
+import tqdm
+from sklearn.decomposition import PCA
 
-from deepoverflow.cleaner import clean
-from deepoverflow.similiar import build_tfidf_model
+from deepoverflow.similar import build_tfidf_model, TFIDF_MAX_FEATURES
 
 DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
+PCA_COMPONENTS = 1024
 
-posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
+with open(os.path.join(DATA_ROOT, 'computed', 'cleaned_questions.pickle'), 'rb') as f:
+    xs = pickle.load(f)
 
-posts_df = pd.read_csv(posts_path, encoding='ISO-8859-1', low_memory=False)
-questions = posts_df['Body'].tolist()
+ids, cleaned_questions = zip(*xs)
 
-print('loaded questions')
+total = len(cleaned_questions)
 
-cleaned_questions = list(map(clean, questions))
+print('loaded cleaned questions')
 
-print('cleaned questions')
+tfidf_path = os.path.join(DATA_ROOT, 'computed', 'tfidf.pickle')
 
-tfidf = build_tfidf_model(cleaned_questions[:1000])
+if os.path.exists(tfidf_path):
+    with open(tfidf_path, 'rb') as f:
+        tfidf = pickle.load(f)
+        print('loaded tfidf')
+else:
+    tfidf = build_tfidf_model(cleaned_questions)
 
-print('built tfidf')
+    print('built tfidf')
 
-pickle.dump(tfidf, os.path.join(DATA_ROOT, 'computed', 'tfidf.pickle'))
+    with open(tfidf_path, 'wb') as f:
+        pickle.dump(tfidf, f)
+        print('saved tfidf')
 
-print('saved tfidf')
-
-transformed_questions = map(tfidf.transform, cleaned_questions)
+transformed_questions = tfidf.transform(cleaned_questions)
 
 print('transformed questions')
 
-pickle.dump(zip(itertools.count(), transformed_questions, questions), os.path.join(DATA_ROOT, 'computed', 'questions.pickle'))
+pca = PCA(n_components=PCA_COMPONENTS)
+transformed_questions = pca.fit_transform(transformed_questions)
+print('performed PCA')
+print(pca.explained_variance_ratio_.sum())
 
-print('saved transformed questions')
+
+t = AnnoyIndex(PCA_COMPONENTS)
+for idx, q in tqdm.tqdm(enumerate(transformed_questions), total=total):
+    t.add_item(idx, q.reshape(-1))
+
+t.build(10)
+
+t.save(os.path.join(DATA_ROOT, 'computed', 'index.ann'))
+
+print('saved Annoy Index')
 
