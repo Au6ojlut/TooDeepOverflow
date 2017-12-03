@@ -17,7 +17,7 @@ def clean(texts):
         for tag in soup.find_all('code'):
             tag.clear()
 
-        text = ''.join(soup.findAll(text=True)).strip('/n')
+        text = ''.join(soup.findAll(text=True)).strip('\n')
         text = url_re.sub('', text)
         tokens = token_re.findall(text.lower())
         tokens = [st.stem(j) for j in tokens if (j not in sw)]

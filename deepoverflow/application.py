@@ -10,20 +10,8 @@ from .cleaner import clean
 GENSIM_WORDS_COUNT = 384
 MAX_ANSWERS = 100
 NUMBER_OF_NEIGHBOURS = 500
-USE_PCA = False
-DEBUG = True
-
-
-# def score(score, views, dist, votes_range=None):
-#     if votes_range is None:
-#         votes_range = [-1, 1]
-#
-#     z = 1.64485
-#     v_min = min(votes_range)
-#     v_width = float(max(votes_range) - v_min)
-#     phat = (score - views * v_min) / v_width / float(views)
-#     rating = (phat + z * z / (2 * views) - z * math.sqrt(abs((phat * (1 - phat) + z * z / (4 * views)) / views))) / (1 + z * z / views)
-#     return dist * (rating * v_width + v_min)
+USE_PCA = True
+DEBUG = False
 
 
 def score(score, views, dist, votes_range=None):
