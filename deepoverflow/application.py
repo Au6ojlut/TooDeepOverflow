@@ -50,11 +50,9 @@ class Application:
         with open(os.path.join(self.data_root, 'computed', 'answers.pickle'), 'rb') as f:
             self.answers = pickle.load(f)
 
-        with open(os.path.join(self.data_root, 'computed', 'answer_properties.pickle'), 'rb') as f:
-            self.answer_properties = pickle.load(f)
-
-        with open(os.path.join(self.data_root, 'computed', 'entities.pickle'), 'rb') as f:
-            self.entities = pickle.load(f)
+        if not DEBUG:
+            with open(os.path.join(self.data_root, 'computed', 'entities.pickle'), 'rb') as f:
+                self.entities = pickle.load(f)
 
     def question2vec(self, question):
         cleaned_question = list(clean([question]))[0]
@@ -103,8 +101,8 @@ class Application:
             if id in self.answers_tree:
                 for ans_id in self.answers_tree[id]:
                     r = score(
-                        self.answer_properties[ans_id]['score'],
-                        self.answer_properties[ans_id]['views'],
+                        self.answers[ans_id][2],
+                        self.answers[ans_id][1],
                         dist
                     )
                     answer_ids.append((r, ans_id))
@@ -116,7 +114,7 @@ class Application:
 
         for r, ans_id in answer_ids:
             text += 'answer: {} rank: {}<br/>'.format(ans_id, r)
-            text += self.answers[ans_id]
+            text += self.answers[ans_id][0]
             text += '<br/><br/>'
 
         return text
@@ -133,8 +131,8 @@ class Application:
             if id in self.answers_tree:
                 for ans_id in self.answers_tree[id]:
                     r = score(
-                        self.answer_properties[ans_id]['score'],
-                        self.answer_properties[ans_id]['views'],
+                        self.answers[ans_id][2],
+                        self.answers[ans_id][1],
                         dist
                     )
                     answer_ids.append((r, ans_id))
@@ -147,7 +145,7 @@ class Application:
         answer_bodies = []
 
         for _, ans_id in answer_ids:
-            answer_bodies.append(self.answers[ans_id])
+            answer_bodies.append(self.answers[ans_id][0])
 
         summarization = self.summarize_v1(answer_bodies)
         summarization = self.replace_entities(summarization)
