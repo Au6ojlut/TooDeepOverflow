@@ -42,6 +42,9 @@ class Application:
         with open(os.path.join(self.data_root, 'computed', 'id_to_acceptedAnswer.pickle'), 'rb') as f:
             self.id_to_acceptedAnswer = pickle.load(f)
 
+        with open(os.path.join(self.data_root, 'computed', 'id_to_tags.pickle'), 'rb') as f:
+            self.id_to_tags = pickle.load(f)
+
         if not DEBUG:
             with open(os.path.join(self.data_root, 'computed', 'entities.pickle'), 'rb') as f:
                 self.entities = pickle.load(f)
@@ -88,6 +91,15 @@ class Application:
             if str(k) in self.id_to_acceptedAnswer:
                 ans_query.append(self.id_to_acceptedAnswer[str(k)])
         return ans_query[:NUMBER_OF_ACCEPTED_ANSWER]
+
+    def get_tags(self, knn_ids):
+        tags = []
+        for k in knn_ids:
+            if k in self.id_to_tags:
+                current_tag = self.id_to_tags[k].replace('><', ' ').replace('<', '').replace('>', '')
+                tags.append(current_tag.split(' '))
+
+        return tags
 
     def debug_process(self, question):
         vec = self.question2vec(question)
