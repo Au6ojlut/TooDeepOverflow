@@ -12,10 +12,11 @@ MAX_ANSWERS = 100
 NUMBER_OF_NEIGHBOURS = 500
 USE_PCA = True
 DEBUG = False
+NUMBER_OF_ACCEPTED_ANSWER = 20
 
 
 def score(score, views, dist, votes_range=None):
-    return dist
+    return dist * score / (views + 1)
 
 
 class Application:
@@ -37,6 +38,9 @@ class Application:
 
         with open(os.path.join(self.data_root, 'computed', 'answers.pickle'), 'rb') as f:
             self.answers = pickle.load(f)
+
+        with open(os.path.join(self.data_root, 'computed', 'id_to_acceptedAnswer.pickle'), 'rb') as f:
+            self.id_to_acceptedAnswer = pickle.load(f)
 
         if not DEBUG:
             with open(os.path.join(self.data_root, 'computed', 'entities.pickle'), 'rb') as f:
@@ -78,10 +82,16 @@ class Application:
 
         return re.sub(r'(?P<name>@\w+)', replacer, text)
 
+    def id_applied_first(self, knn_ids):
+        ans_query = []
+        for k in knn_ids:
+            if str(k) in self.id_to_acceptedAnswer:
+                ans_query.append(self.id_to_acceptedAnswer[str(k)])
+        return ans_query[:NUMBER_OF_ACCEPTED_ANSWER]
+
     def debug_process(self, question):
         vec = self.question2vec(question)
         knn_ids, dists = self.index.knnQuery(vec, k=NUMBER_OF_NEIGHBOURS)
-
         text = 'SIMILIAR QUESTIONS IDS: {}<br/>'.format(', '.join(map(str, knn_ids)))
 
         answer_ids = []
@@ -98,12 +108,19 @@ class Application:
         text += '<br/>ANSWERS ({}):<br/>'.format(len(answer_ids))
 
         answer_ids.sort(key=lambda p: p[0], reverse=True)
-        answer_ids = answer_ids[:MAX_ANSWERS]
-
-        for r, ans_id in answer_ids:
-            text += 'answer: {} rank: {}<br/>'.format(ans_id, r)
-            text += self.answers[ans_id][0]
-            text += '<br/><br/>'
+        final_answer = self.id_applied_first(knn_ids=knn_ids)
+        for id in answer_ids:
+            if id[1] not in final_answer:
+                final_answer.append(id[1])
+        answer_ids.append([m_ans_id[1] for m_ans_id in answer_ids])
+        final_answer = final_answer[:MAX_ANSWERS]
+        for ans_id in final_answer:
+            try:
+                text += 'answer: {} rank:<br/>'.format(ans_id)
+                text += self.answers[ans_id][0]
+                text += '<br/><br/>'
+            except:
+                continue
 
         return text
 
@@ -128,11 +145,17 @@ class Application:
         print('answers:', len(answer_ids))
 
         answer_ids.sort(key=lambda p: p[0], reverse=True)
-        answer_ids = answer_ids[:MAX_ANSWERS]
+
+        final_answer = self.id_applied_first(knn_ids=knn_ids)
+        set_final_answer = set(final_answer)
+        for id in answer_ids:
+            if id[1] not in set_final_answer:
+                final_answer.append(id[1])
+        final_answer = final_answer[:MAX_ANSWERS]
 
         answer_bodies = []
 
-        for _, ans_id in answer_ids:
+        for ans_id in final_answer:
             answer_bodies.append(self.answers[ans_id][0])
 
         summarization = self.summarize_v1(answer_bodies)
