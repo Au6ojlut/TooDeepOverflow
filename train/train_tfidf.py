@@ -1,6 +1,7 @@
 import os.path
 import nmslib
 import pickle
+import tqdm
 from sklearn.decomposition import TruncatedSVD
 
 from deepoverflow.similar import build_tfidf_model
@@ -36,29 +37,38 @@ transformed_questions = tfidf.transform(cleaned_questions)
 
 print('transformed questions')
 
-pca_path = os.path.join(DATA_ROOT, 'computed', 'pca.pickle')
+# pca_path = os.path.join(DATA_ROOT, 'computed', 'pca.pickle')
+#
+# if os.path.exists(pca_path):
+#     with open(pca_path, 'rb') as f:
+#         pca = pickle.load(f)
+#
+#     print('loaded PCA')
+#
+#     transformed_questions = pca.transform(transformed_questions)
+#     print('performed PCA')
+# else:
+#     pca = TruncatedSVD(n_components=PCA_COMPONENTS, n_iter=10, random_state=42)
+#     transformed_questions = pca.fit_transform(transformed_questions)
+#     print('performed PCA')
+#     print(pca.explained_variance_ratio_.sum())
+#
+#     with open(pca_path, 'wb') as f:
+#         pickle.dump(pca, f)
+#
+#     print('saved PCA')
 
-if os.path.exists(pca_path):
-    with open(pca_path, 'rb') as f:
-        pca = pickle.load(f)
+# index = nmslib.init(method='hnsw', space='cosinesimil')
+# index.addDataPointBatch(data=transformed_questions, ids=ids)
+# index.createIndex({'post': 2}, print_progress=True)
+# index.saveIndex(os.path.join(DATA_ROOT, 'computed', 'index.nmslib'))
+#
+# print('saved nmslib index')
 
-    print('loaded PCA')
-
-    transformed_questions = pca.transform(transformed_questions)
-    print('performed PCA')
-else:
-    pca = TruncatedSVD(n_components=PCA_COMPONENTS, n_iter=10, random_state=42)
-    transformed_questions = pca.fit_transform(transformed_questions)
-    print('performed PCA')
-    print(pca.explained_variance_ratio_.sum())
-
-    with open(pca_path, 'wb') as f:
-        pickle.dump(pca, f)
-
-    print('saved PCA')
 
 index = nmslib.init(method='hnsw', space='cosinesimil')
-index.addDataPointBatch(data=transformed_questions, ids=ids)
+for id, q in tqdm.tqdm(zip(ids, transformed_questions)):
+    index.addDataPoint(data=q.todense().reshape(-1), id=id)
 index.createIndex({'post': 2}, print_progress=True)
 index.saveIndex(os.path.join(DATA_ROOT, 'computed', 'index.nmslib'))
 
