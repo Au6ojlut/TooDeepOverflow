@@ -15,12 +15,12 @@ def get_entities(posts_df):
         soup = BeautifulSoup(row['Body'], 'lxml')
 
         for tag in soup.find_all('code'):
-            code = '@entity_' + str(row['Id']) + '_' + str(counter)
+            code = '@code_' + str(row['Id']) + '_' + str(counter)
             entities_dict[code] = tag.string
             tag.string = code
             counter += 1
         for tag in soup.find_all('a', href=True):
-            code = '@entity_' + str(counter)
+            code = '@url_' + str(row['Id']) + '_' + str(counter)
             entities_dict[code] = tag.string
             tag.string = code
             counter += 1

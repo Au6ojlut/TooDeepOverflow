@@ -47,7 +47,7 @@ if os.path.exists(pca_path):
     transformed_questions = pca.transform(transformed_questions)
     print('performed PCA')
 else:
-    pca = TruncatedSVD(n_components=PCA_COMPONENTS, n_iter=1, random_state=42)
+    pca = TruncatedSVD(n_components=PCA_COMPONENTS, n_iter=10, random_state=42)
     transformed_questions = pca.fit_transform(transformed_questions)
     print('performed PCA')
     print(pca.explained_variance_ratio_.sum())
