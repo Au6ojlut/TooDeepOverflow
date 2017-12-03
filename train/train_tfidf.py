@@ -6,7 +6,7 @@ from sklearn.decomposition import TruncatedSVD
 
 from deepoverflow.similar import build_tfidf_model
 
-DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
+from deepoverflow.config import DATA_ROOT
 PCA_COMPONENTS = 1024
 
 with open(os.path.join(DATA_ROOT, 'computed', 'cleaned_questions.pickle'), 'rb') as f:

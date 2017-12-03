@@ -4,7 +4,7 @@ import pickle
 import tqdm
 
 
-DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
+from deepoverflow.config import DATA_ROOT
 MAX_SCORE = 5
 
 

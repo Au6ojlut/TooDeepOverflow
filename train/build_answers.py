@@ -5,7 +5,7 @@ import tqdm
 from bs4 import BeautifulSoup
 
 
-DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
+from deepoverflow.config import DATA_ROOT
 
 answers = {}
 

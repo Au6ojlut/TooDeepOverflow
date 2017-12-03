@@ -4,7 +4,7 @@ import pickle
 from tqdm import tqdm
 from deepoverflow.cleaner import clean
 
-DATA_ROOT = '/home/egor/ml/DeepOverflow/data'
+from deepoverflow.config import DATA_ROOT
 
 posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
 

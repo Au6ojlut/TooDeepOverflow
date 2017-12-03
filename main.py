@@ -5,7 +5,9 @@ from functools import wraps, update_wrapper
 import datetime
 app = Flask(__name__)
 
-do = Application('/home/egor/ml/DeepOverflow/data')
+from deepoverflow.config import DATA_ROOT
+
+do = Application(DATA_ROOT)
 
 
 def summarize(query):
