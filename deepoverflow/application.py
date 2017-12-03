@@ -96,7 +96,7 @@ class Application:
         vec = self.question2vec(question)
         knn_ids, dists = self.index.knnQuery(vec, k=NUMBER_OF_NEIGHBOURS)
 
-        text = 'SIMILIAR QUESTIONS IDS: {}\n'.format(', '.join(map(str, knn_ids)))
+        text = 'SIMILIAR QUESTIONS IDS: {}<br/>'.format(', '.join(map(str, knn_ids)))
 
         answer_ids = []
         for id, dist in zip(knn_ids, dists):
@@ -109,15 +109,15 @@ class Application:
                     )
                     answer_ids.append((r, ans_id))
 
-        text += 'ANSWERS ({}):\n'.format(len(answer_ids))
+        text += '<br/>ANSWERS ({}):<br/>'.format(len(answer_ids))
 
         answer_ids.sort(key=lambda p: p[0], reverse=True)
         answer_ids = answer_ids[:MAX_ANSWERS]
 
         for r, ans_id in answer_ids:
-            text += 'answer: {} rank: {}\n'.format(ans_id, r)
+            text += 'answer: {} rank: {}<br/>'.format(ans_id, r)
             text += self.answers[ans_id]
-            text += '\n'
+            text += '<br/><br/>'
 
         return text
 
