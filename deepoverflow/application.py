@@ -13,6 +13,7 @@ NUMBER_OF_NEIGHBOURS = 500
 USE_PCA = True
 DEBUG = False
 NUMBER_OF_ACCEPTED_ANSWER = 20
+NUMBER_OF_TEGS = 5
 
 
 def score(score, views, dist, votes_range=None):
@@ -157,7 +158,8 @@ class Application:
         print('answers:', len(answer_ids))
 
         answer_ids.sort(key=lambda p: p[0], reverse=True)
-
+        post_tags = self.get_tags(knn_ids=knn_ids)[:NUMBER_OF_TEGS]
+        print(' '.join(post_tags))
         final_answer = self.id_applied_first(knn_ids=knn_ids)
         set_final_answer = set(final_answer)
         for id in answer_ids:
