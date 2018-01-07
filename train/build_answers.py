@@ -3,13 +3,12 @@ import pandas as pd
 import pickle
 import tqdm
 from bs4 import BeautifulSoup
-
-
 from deepoverflow.config import DATA_ROOT
 
 answers = {}
 
-posts_df = pd.read_csv(os.path.join(DATA_ROOT, 'incoming', 'Posts.csv'), encoding='ISO-8859-1', low_memory=False, dtype='str')
+posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
+posts_df = pd.read_csv(posts_path, encoding='ISO-8859-1', low_memory=False, dtype='str')
 
 posts_df.loc[:, 'ViewCount'] = posts_df['ViewCount'].fillna(100)
 posts_df.loc[:, 'Score'] = posts_df['Score'].fillna(0)

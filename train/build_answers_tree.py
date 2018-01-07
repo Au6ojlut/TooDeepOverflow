@@ -10,8 +10,8 @@ MAX_SCORE = 5
 
 answers_tree = {}
 
-
-posts_df = pd.read_csv(os.path.join(DATA_ROOT, 'incoming', 'Posts.csv'), encoding='ISO-8859-1', low_memory=False, dtype='str')
+posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
+posts_df = pd.read_csv(posts_path, encoding='ISO-8859-1', low_memory=False, dtype='str')
 
 total = len(posts_df.index)
 

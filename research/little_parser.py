@@ -2,11 +2,10 @@ import pandas as pd
 import os
 import pickle
 import math
+from deepoverflow.config import DATA_ROOT
 
-posts_file = "Posts.csv"
-path = "D:/data"
-
-posts_info = pd.read_csv(os.path.join(path, posts_file), encoding="ISO-8859-1")
+posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
+posts_info = pd.read_csv(posts_path, encoding="ISO-8859-1")
 
 posts = posts_info[['Id', 'AcceptedAnswerId', 'PostTypeId']]
 

@@ -2,6 +2,7 @@ import pickle
 import pandas as pd
 import os
 from bs4 import BeautifulSoup
+from deepoverflow.config import DATA_ROOT
 
 
 def get_entities(posts_df):
@@ -39,9 +40,9 @@ def save_entities(ent_dict, proc_answers):
         pickle.dump(proc_answers, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
-posts_file = "Posts.csv"
-path = "D:/data"
-posts_info = pd.read_csv(os.path.join(path, posts_file), encoding="ISO-8859-1")
+
+posts_path = os.path.join(DATA_ROOT, 'incoming', 'Posts.csv')
+posts_info = pd.read_csv(posts_path, encoding="ISO-8859-1")
 
 posts = posts_info[['Id', 'Body', 'PostTypeId']]
 gen_dict, proc_answers = get_entities(posts)
